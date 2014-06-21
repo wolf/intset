@@ -14,8 +14,7 @@ type IntSet struct {
 
 func New(size int, values ...int) *IntSet {
 	result := &IntSet{0, make([]int, size), make([]int, size)}
-	result.Add(values...)
-	return result
+	return result.Add(values...)
 }
 
 func (is *IntSet) Copy() *IntSet {
@@ -56,7 +55,7 @@ func (is *IntSet) Values() []int {
 	return result
 }
 
-func (is *IntSet) Add(values ...int) {
+func (is *IntSet) Add(values ...int) *IntSet {
 	for _, v := range values {
 		if 0 <= v && v < len(is.keys) && !is.Contains(v) {
 			is.keys[v] = is.length
@@ -64,9 +63,10 @@ func (is *IntSet) Add(values ...int) {
 			is.length++
 		}
 	}
+	return is
 }
 
-func (is *IntSet) Remove(values ...int) {
+func (is *IntSet) Remove(values ...int) *IntSet {
 	for _, v := range values {
 		if is.Contains(v) {
 			kMoving := is.set[is.length-1]
@@ -76,11 +76,11 @@ func (is *IntSet) Remove(values ...int) {
 			is.length--
 		}
 	}
+	return is
 }
 
 func (is *IntSet) Union(rhs *IntSet) *IntSet {
-	is.Add(rhs.set[:rhs.length]...)
-	return is
+	return is.Add(rhs.set[:rhs.length]...)
 }
 
 func Union(lhs, rhs *IntSet) *IntSet {
@@ -88,8 +88,7 @@ func Union(lhs, rhs *IntSet) *IntSet {
 }
 
 func (is *IntSet) Difference(rhs *IntSet) *IntSet {
-	is.Remove(rhs.set[:rhs.length]...)
-	return is
+	return is.Remove(rhs.set[:rhs.length]...)
 }
 
 func Difference(lhs, rhs *IntSet) *IntSet {
