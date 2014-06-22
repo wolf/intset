@@ -48,6 +48,25 @@ type IntSet struct {
 	set    []int
 }
 
+type ErrorCode string
+
+func (e ErrorCode) String() string {
+	return string(e)
+}
+
+type Error struct {
+	Code ErrorCode
+}
+
+func (e *Error) Error() string {
+	return e.Code.String()
+}
+
+const (
+	ErrSetIsEmpty      ErrorCode = "set is empty"
+	ErrOutsideUniverse ErrorCode = "value is outside set universe"
+)
+
 func New(universeSize int, values ...int) *IntSet {
 	result := &IntSet{0, make([]int, universeSize), make([]int, universeSize)}
 	return result.Add(values...)
@@ -178,7 +197,7 @@ func Difference(lhs, rhs *IntSet) *IntSet {
 // Choose is the order of complexity of rand.Int
 func (is *IntSet) Choose() (choice int, err error) {
 	if is.Empty() {
-		return 0, nil // error("set is empty")
+		return 0, &Error{ErrSetIsEmpty}
 	}
 	max := big.NewInt(int64(is.length))
 	ip, err := rand.Int(rand.Reader, max)
