@@ -72,8 +72,18 @@ func New(universeSize int, values ...int) *IntSet {
 	return result.Add(values...)
 }
 
-// Copy duplicates a set.
+// NewUniverse creates a set containing every element in its universe, e.g.,
+// for a set of universe size 3, the new set will contain 0, 1, and 2.
+func NewUniverse(universeSize int) *IntSet {
+	result := &IntSet{universeSize, make([]int, universeSize), make([]int, universeSize)}
+	for i, _ := range result.keys {
+		result.keys[i] = i
+		result.set[i] = i
+	}
+	return result
+}
 
+// Copy duplicates a set.
 // The new set contains exactly the same members as the receiver set.  Copy is
 // O(n) where n is the number of elements actually in the receiver set.
 func (is *IntSet) Copy() *IntSet {
@@ -106,7 +116,6 @@ func (is *IntSet) UniverseSize() int {
 }
 
 // Contains returns true if the given value is a member of the receiver set.
-
 // Contains is O(1).
 func (is *IntSet) Contains(value int) bool {
 	if value < 0 || len(is.keys) <= value { // is value within the set universe?
@@ -117,7 +126,6 @@ func (is *IntSet) Contains(value int) bool {
 }
 
 // Values returns a new slice containing (in no particular order) all the elements in the receiver set.
-
 // Values is O(n), n the number of elements in the receiver set.
 func (is *IntSet) Values() []int {
 	result := make([]int, is.length)
@@ -126,7 +134,6 @@ func (is *IntSet) Values() []int {
 }
 
 // Add puts a new element into the receiver set, if that element is in the set's universe.
-
 // Add is O(1) for a single value and O(n), n the number of values to add, for a list of values.
 // Add returns the receiver set to allow method chaining.
 func (is *IntSet) Add(values ...int) *IntSet {
@@ -141,7 +148,6 @@ func (is *IntSet) Add(values ...int) *IntSet {
 }
 
 // Remove removes elements from the receiver set.
-
 // Remove is O(1) for a single value and O(n), n the number of values to remove, for a list of values.
 // Remove returns the receiver set to allow method chaining.
 func (is *IntSet) Remove(values ...int) *IntSet {
@@ -163,7 +169,6 @@ func (is *IntSet) Remove(values ...int) *IntSet {
 }
 
 // Union with a receiver updates the receiver set to also include all the elements in other.
-
 // Union is O(n), n the number of elements in other.
 // Union returns the receiver set to allow method chaining.
 func (is *IntSet) Union(other *IntSet) *IntSet {
@@ -171,14 +176,12 @@ func (is *IntSet) Union(other *IntSet) *IntSet {
 }
 
 // Union with two arguments produces a new set that contains exactly all the elements in both lhs and rhs.
-
 // Union is O(n+m), n the number of elements in lhs, m the number of elements in rhs.
 func Union(lhs, rhs *IntSet) *IntSet {
 	return lhs.Copy().Union(rhs)
 }
 
 // Difference with a receiver updates the receiver set to remove any element that also appears in other.
-
 // Difference is O(n), n the number of elements in other.
 // Difference returns the receiver set to allow method chaining.
 func (is *IntSet) Difference(other *IntSet) *IntSet {
@@ -186,14 +189,12 @@ func (is *IntSet) Difference(other *IntSet) *IntSet {
 }
 
 // Difference with two arguments produces a new set that contains exactly all the elements in lhs that do not appear in rhs.
-
 // Difference is O(n+m), n the number of elements in lhs, m the number of elements in rhs
 func Difference(lhs, rhs *IntSet) *IntSet {
 	return lhs.Copy().Difference(rhs)
 }
 
 // Choose returns an element at random from the receiver set.  The set itself is not modified.
-
 // Choose is the order of complexity of rand.Int
 func (is *IntSet) Choose() (choice int, err error) {
 	if is.Empty() {
