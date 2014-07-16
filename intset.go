@@ -147,6 +147,24 @@ func (is *IntSet) Add(values ...int) *IntSet {
 	return is
 }
 
+// MustAdd puts a new element into the receiver set, returning nil if successful, or an error otherwise.
+// MustAdd is O(1) for a single value and O(n), n the number of values to add, for a list of values.
+// Note that MustAdd will stop and return an error at the very first bad value; subsequent good values
+// will not be added
+func (is *IntSet) MustAdd(values ...int) error {
+	for _, v := range values {
+		if v < 0 || len(is.keys) <= v {
+			return &Error{ErrOutsideUniverse}
+		}
+		if !is.Contains(v) {
+			is.keys[v] = is.length
+			is.set[is.length] = v
+			is.length++
+		}
+	}
+	return nil
+}
+
 // Remove removes elements from the receiver set.
 // Remove is O(1) for a single value and O(n), n the number of values to remove, for a list of values.
 // Remove returns the receiver set to allow method chaining.
@@ -175,10 +193,23 @@ func (is *IntSet) Union(other *IntSet) *IntSet {
 	return is.Add(other.set[:other.length]...)
 }
 
+// MustUnion updates the receiver set to also include all the elements in other, returning nil if successful.
+// MustUnion is O(n), n the number of elements in other.
+// Note that MustUnion will stop immediately if it hits a value outside the universe of the receiver.
+func (is *IntSet) MustUnion(other *IntSet) error {
+	return is.MustAdd(other.set[:other.length]...)
+}
+
 // Union with two arguments produces a new set that contains exactly all the elements in both lhs and rhs.
 // Union is O(n+m), n the number of elements in lhs, m the number of elements in rhs.
 func Union(lhs, rhs *IntSet) *IntSet {
-	return lhs.Copy().Union(rhs)
+	greater := lhs
+	lesser := rhs
+	if lhs.UniverseSize() < rhs.UniverseSize() {
+		lesser = lhs
+		greater = rhs
+	}
+	return greater.Copy().Union(lesser)
 }
 
 // Difference with a receiver updates the receiver set to remove any element that also appears in other.
